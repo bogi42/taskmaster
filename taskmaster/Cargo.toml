@@ -1,0 +1,19 @@
+[package]
+name = "taskmaster"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tasks = { path = "../tasks" } 
+
+clap = { version = "4.0", features = ["derive"] } # for command-line argument processing
+dirs = "5.0" # for getting home directory
+colored = "2.0" # use colors on terminal
+rustyline = "16.0"
+
+[profile.release]
+strip = true
+lto = true # Link Time Optimization
+codegen-units = 1 # reduce parallelislm for more aggressive LTO 
+opt-level = "s" # optimize for binary size
+

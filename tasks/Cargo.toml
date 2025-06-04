@@ -1,0 +1,15 @@
+[package]
+name = "tasks"
+version = "0.2.0"
+edition = "2024"
+
+[dependencies]
+# serialization / deserialition, incl. JSON format
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+# is used by Task to return colored string for priority
+colored = "2.0"
+# taskerror handles ReadlineErrors
+rustyline = "16.0"
+# for defining own Errors 
+thiserror = "1.0"
