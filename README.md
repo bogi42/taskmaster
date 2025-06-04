@@ -13,6 +13,8 @@
 * **Clear Completed Tasks:** Easily clean up your list by removing all tasks marked as completed.
 * **Colored Output:** Task statuses and priorities are visually highlighted using terminal colors for quick identification.
 
+### New in Version 0.3.0:
+* **Stable IDs:** Commands no longer react to the index of a task, but to it's unique ID.  The ID for a task will stay stable throughout it's lifetime
 ---
 
 ## Installation & Setup
