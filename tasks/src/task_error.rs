@@ -4,7 +4,7 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum TaskError {
-    #[error("Task with index {0} not found")]
+    #[error("Task with id {0} not found")]
     TaskNotFound(usize),
     #[error("File I/O error: {0}")]
     Io(#[from] io::Error), //automatically convert from io::Error to TaskError::Io

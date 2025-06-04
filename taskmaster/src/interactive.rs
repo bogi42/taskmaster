@@ -46,27 +46,27 @@ impl<'a> InteractiveMode<'a> {
         );
         println!(
             "  {:<25} - {}",
-            "c / complete <idx>".cyan().bold(),
+            "c / complete <id>".cyan().bold(),
             "Mark a task as completed"
         );
         println!(
             "  {:<25} - {}",
-            "up / + <idx>".cyan().bold(),
+            "up / + <id>".cyan().bold(),
             "Increase a task's priority"
         );
         println!(
             "  {:<25} - {}",
-            "down / - <idx>".cyan().bold(),
+            "down / - <id>".cyan().bold(),
             "Decrease a task's priority"
         );
         println!(
             "  {:<25} - {}",
-            "d / delete <idx>".cyan().bold(),
+            "d / delete <id>".cyan().bold(),
             "Delete a task"
         );
         println!(
             "  {:<25} - {}",
-            "ch / change <idx> <desc>".cyan().bold(),
+            "ch / change <id> <desc>".cyan().bold(),
             "Change a task's description"
         );
         println!(
@@ -208,7 +208,7 @@ impl<'a> InteractiveMode<'a> {
             return Err(TaskError::Empty("Description".to_string()));
         }
         let index = self.manager.add_task(desc);
-        println!("{}", format!("Added task at index {}.", index).green());
+        println!("{}", format!("Added task with ID {}.", index).green());
         Ok(())
     }
 
@@ -216,7 +216,7 @@ impl<'a> InteractiveMode<'a> {
         /* if args has the wrong length, or isn't a number, we'll get a subprompt from the user */
         let istr: String;
         if args.len() != 1 {
-            let pr = self.read_input(&format!("{}> ", "Index".cyan()));
+            let pr = self.read_input(&format!("{}> ", "ID".cyan()));
             match pr {
                 Ok(s) => istr = s,
                 Err(TaskError::InputCancelled) => return Err(TaskError::InputCancelled),
@@ -226,13 +226,13 @@ impl<'a> InteractiveMode<'a> {
             istr = args[0].to_string();
         }
         match istr.parse::<usize>() {
-            Ok(index) => match self.manager.complete_task(index) {
+            Ok(id) => match self.manager.complete_task(id) {
                 Ok(msg) => println!("{}", msg.green()),
-                Err(_) => return Err(TaskError::TaskNotFound(index)),
+                Err(_) => return Err(TaskError::TaskNotFound(id)),
             },
             Err(_) => {
                 return Err(TaskError::ArgumentMismatch(format!(
-                    "wrong argument: '{}' is not a valid number for an index.",
+                    "wrong argument: '{}' is not a valid task ID.",
                     istr
                 )))
             }
@@ -244,7 +244,7 @@ impl<'a> InteractiveMode<'a> {
         /* if args has the wrong length, or isn't a number, we'll get a subprompt from the user */
         let istr: String;
         if args.len() != 1 {
-            let pr = self.read_input(&format!("{}> ", "Index".cyan()));
+            let pr = self.read_input(&format!("{}> ", "ID".cyan()));
             match pr {
                 Ok(s) => istr = s,
                 Err(TaskError::InputCancelled) => return Err(TaskError::InputCancelled),
@@ -254,13 +254,13 @@ impl<'a> InteractiveMode<'a> {
             istr = args[0].to_string();
         }
         match istr.parse::<usize>() {
-            Ok(index) => match self.manager.change_priority(index, prioritize) {
+            Ok(id) => match self.manager.change_priority(id, prioritize) {
                 Ok(msg) => println!("{}", msg.green()),
-                Err(_) => return Err(TaskError::TaskNotFound(index)),
+                Err(_) => return Err(TaskError::TaskNotFound(id)),
             },
             Err(_) => {
                 return Err(TaskError::ArgumentMismatch(format!(
-                    "wrong argument: '{}' is not a valid number for an index.",
+                    "wrong argument: '{}' is not a valid task ID.",
                     istr
                 )))
             }
@@ -272,7 +272,7 @@ impl<'a> InteractiveMode<'a> {
         /* if args has the wrong length, or isn't a number, we'll get a subprompt from the user */
         let istr: String;
         if args.len() != 1 {
-            let pr = self.read_input(&format!("{}> ", "Index".cyan()));
+            let pr = self.read_input(&format!("{}> ", "ID".cyan()));
             match pr {
                 Ok(s) => istr = s,
                 Err(TaskError::InputCancelled) => return Err(TaskError::InputCancelled),
@@ -282,13 +282,13 @@ impl<'a> InteractiveMode<'a> {
             istr = args[0].to_string();
         }
         match istr.parse::<usize>() {
-            Ok(index) => match self.manager.delete_task(index) {
+            Ok(id) => match self.manager.delete_task(id) {
                 Ok(msg) => println!("{}", msg.green()),
-                Err(_) => return Err(TaskError::TaskNotFound(index)),
+                Err(_) => return Err(TaskError::TaskNotFound(id)),
             },
             Err(_) => {
                 return Err(TaskError::ArgumentMismatch(format!(
-                    "wrong argument: '{}' is not a valid number for an index.",
+                    "wrong argument: '{}' is not a valid task ID.",
                     istr
                 )))
             }
@@ -300,7 +300,7 @@ impl<'a> InteractiveMode<'a> {
         /* part 1: check for index */
         let istr: String;
         if args.len() < 1 {
-            match self.read_input(&format!("{}> ", "Index".cyan())) {
+            match self.read_input(&format!("{}> ", "ID".cyan())) {
                 Ok(s) => istr = s,
                 Err(TaskError::InputCancelled) => return Err(TaskError::InputCancelled),
                 Err(e) => return Err(e),
@@ -309,7 +309,7 @@ impl<'a> InteractiveMode<'a> {
             istr = args[0].to_string();
         }
         /* parse the index string, handle invalid parsing */
-        let index = istr.parse::<usize>().map_err(|_| {
+        let id = istr.parse::<usize>().map_err(|_| {
             TaskError::ArgumentMismatch(format!(
                 "wrong argument: '{}' is not a valid number for an index.",
                 istr
@@ -317,10 +317,7 @@ impl<'a> InteractiveMode<'a> {
         })?;
         /* part 2: temporarily store old description */
         let old_desc: String = {
-            let task_ref = self
-                .manager
-                .at(index)
-                .ok_or(TaskError::TaskNotFound(index))?;
+            let task_ref = self.manager.at(id).ok_or(TaskError::TaskNotFound(id))?;
             task_ref.get_description().to_string()
         };
         /* part 3: check for new description */
@@ -341,10 +338,7 @@ impl<'a> InteractiveMode<'a> {
         if new_desc.is_empty() {
             return Err(TaskError::Empty("Description".to_string()));
         }
-        let task_to_update = self
-            .manager
-            .at_mut(index)
-            .ok_or(TaskError::TaskNotFound(index))?;
+        let task_to_update = self.manager.at_mut(id).ok_or(TaskError::TaskNotFound(id))?;
         task_to_update.set_description(new_desc);
         println!(
             "Updated task description from '{}' to '{}'.",

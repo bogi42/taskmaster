@@ -31,9 +31,9 @@ enum Commands {
     /// change description of Task
     #[command(visible_alias = "ch")]
     Change {
-        /// The 1-based index of the task you want to change
+        /// The ID of the task you want to change
         #[arg(required = true)]
-        index: usize,
+        id: usize,
         /// The new description for the task
         #[arg(required = true)]
         description: Vec<String>,
@@ -44,26 +44,26 @@ enum Commands {
     /// Mark a task as completed
     #[command(visible_alias = "c")]
     Complete {
-        /// The 1-based index of the task to mark as complete
+        /// The ID of the task to mark as complete
         #[arg(required = true)]
-        index: usize,
+        id: usize,
     },
     /// Ranks up the task's priority
     Up {
-        /// The 1-based index of the task who's priority should be upranked
-        index: usize,
+        /// The ID of the task who's priority should be upranked
+        id: usize,
     },
     /// Ranks down the task's priority
     Down {
-        /// The 1-based index of the task who's priority should be downranked
-        index: usize,
+        /// The ID of the task who's priority should be downranked
+        id: usize,
     },
     /// Delete a task
     #[command(visible_alias = "d")]
     Delete {
-        /// The 1-based index of the task to delete
+        /// The ID of the task to delete
         #[arg(required = true)]
-        index: usize,
+        id: usize,
     },
     /// Clear all completed task from the list
     #[command(visible_alias = "clr")]
@@ -104,28 +104,28 @@ fn run_app() -> Result<(), TaskError> {
                 task_manager.at(new_index).unwrap().get_description()
             );
         }
-        Commands::Change { index, description } => {
+        Commands::Change { id, description } => {
             let desc_str = build_description(description)?;
-            let msg = task_manager.change_description(*index, desc_str)?;
+            let msg = task_manager.change_description(*id, desc_str)?;
             println!("{}", msg);
         }
         Commands::List => {
             task_manager.list_tasks();
         }
-        Commands::Complete { index } => {
-            let msg = task_manager.complete_task(*index)?;
+        Commands::Complete { id } => {
+            let msg = task_manager.complete_task(*id)?;
             println!("{}", msg);
         }
-        Commands::Up { index } => {
-            let msg = task_manager.prioritize_task(*index)?;
+        Commands::Up { id } => {
+            let msg = task_manager.prioritize_task(*id)?;
             println!("{}", msg);
         }
-        Commands::Down { index } => {
-            let msg = task_manager.deprioritize_task(*index)?;
+        Commands::Down { id } => {
+            let msg = task_manager.deprioritize_task(*id)?;
             println!("{}", msg);
         }
-        Commands::Delete { index } => {
-            let msg = task_manager.delete_task(*index)?;
+        Commands::Delete { id } => {
+            let msg = task_manager.delete_task(*id)?;
             println!("{}", msg);
         }
         Commands::Clear => {

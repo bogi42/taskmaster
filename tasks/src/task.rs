@@ -15,7 +15,6 @@ impl Default for Priority {
         Priority::Medium
     }
 }
-
 /* this is how the Priority will be displayed */
 impl fmt::Display for Priority {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -27,8 +26,16 @@ impl fmt::Display for Priority {
     }
 }
 
+/**** task_id: new field in version 0.3.0 */
+/* default is needed for serde default, backwards compatibility */
+fn default_task_id() -> usize {
+    0
+}
+
 #[derive(Debug, Serialize, Deserialize)] // add Debug trait for easy printing during development
 pub struct Task {
+    #[serde(default = "default_task_id")]
+    id: usize,
     description: String,
     completed: bool,
     #[serde(default)]
@@ -36,13 +43,22 @@ pub struct Task {
 }
 
 impl Task {
-    // Constructor for convenience
-    pub fn new<S: Into<String>>(description: S) -> Self {
+    /// full-fledged Constructor
+    pub fn new_task<S: Into<String>>(description: S, id: usize, priority: Priority) -> Self {
         Task {
+            id,
             description: description.into(),
             completed: false,
-            priority: Priority::Medium,
+            priority,
         }
+    }
+
+    pub fn get_id(&self) -> usize {
+        self.id
+    }
+
+    pub fn set_id(&mut self, new_id: usize) {
+        self.id = new_id;
     }
 
     /// ranks priority up
